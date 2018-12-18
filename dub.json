@@ -1,0 +1,15 @@
+{
+	"name": "asr",
+	"authors": [
+		"Fitbos"
+	],
+	"description": "Yet another soft renderer",
+	"copyright": "Copyright © 2018, Fitbos",
+	"license": "MIT",
+	"dependencies": {
+		"derelict-sdl2": {
+			"version": "~>3.0.0-beta"
+		}
+	},
+	"targetPath": "./bin"
+}

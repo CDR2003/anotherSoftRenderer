@@ -69,7 +69,7 @@ public class Game
         }
         scope(exit) SDL_DestroyWindow(window);
 
-        auto surface = SDL_GetWindowSurface(window);
+        auto screen = SDL_GetWindowSurface(window);
 
         auto renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
         if (renderer == null)
@@ -78,8 +78,11 @@ public class Game
             return;
         }
         scope(exit) SDL_DestroyRenderer(renderer);
-        
-        _graphicsDevice = new GraphicsDevice(renderer);
+
+        auto backBufferTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TextureAccess.SDL_TEXTUREACCESS_STREAMING, _windowWidth, _windowHeight);
+        scope(exit) SDL_DestroyTexture(backBufferTexture);
+
+        _graphicsDevice = new GraphicsDevice(_windowWidth, _windowHeight);
 
         auto immutable oldTicks = SDL_GetTicks();
         auto running = true;
@@ -100,6 +103,8 @@ public class Game
             this.update(deltaTime);
             this.draw();
 
+            this.bitBlit(renderer, backBufferTexture);
+
             SDL_RenderPresent(renderer);
         }
     }
@@ -110,5 +115,26 @@ public class Game
 
     public void draw()
     {
+    }
+
+    private void bitBlit(SDL_Renderer* renderer, SDL_Texture* backBufferTexture)
+    {
+        uint* pixels = null;
+        int pitch = 0;
+        SDL_LockTexture(backBufferTexture, null, cast(void**)&pixels, &pitch);
+
+        auto backBuffer = _graphicsDevice.backBuffer;
+        for (int y = 0; y < backBuffer.height; y++)
+        {
+            for (int x = 0; x < backBuffer.width; x++)
+            {
+                auto pos = y * (pitch / uint.sizeof) + x;
+                pixels[pos] = backBuffer.getPixel(x, y).toUInt;
+            }
+        }
+
+        SDL_UnlockTexture(backBufferTexture);
+
+        SDL_RenderCopy(renderer, backBufferTexture, null, null);
     }
 }

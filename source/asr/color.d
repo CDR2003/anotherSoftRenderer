@@ -12,7 +12,7 @@ public struct ColorT(T)
 
     public this(T r, T g, T b)
     {
-        static if (is(T == float) || is(T == double))
+        static if (is(T == float))
         {
             this(r, g, b, 1.0f);
         }
@@ -30,7 +30,7 @@ public struct ColorT(T)
         this.a = a;
     }
 
-    static if (is(T == float) || is(T == double))
+    static if (is(T == float))
     {
         private static immutable T max = 1;
     }
@@ -64,10 +64,15 @@ alias Color = ColorT!float;
 alias Color32 = ColorT!ubyte;
 
 
-public Color32 toColor32(const ref Color color)
+public Color32 toColor32(const Color color)
 {
     return Color32(cast(ubyte)(color.r * 255),
                    cast(ubyte)(color.g * 255),
                    cast(ubyte)(color.b * 255),
                    cast(ubyte)(color.a * 255));
+}
+
+public uint toUInt(const Color32 color)
+{
+    return (cast(uint)color.r << 24) | (cast(uint)color.g << 16) | (cast(uint)color.b << 8) | cast(uint)color.a;
 }

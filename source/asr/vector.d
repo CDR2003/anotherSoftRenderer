@@ -67,7 +67,7 @@ public struct VectorT(T, int N)
         T total = 0;
         foreach (T component; v)
         {
-            total += component;
+            total += component * component;
         }
         return total;
     }
@@ -80,6 +80,26 @@ public struct VectorT(T, int N)
             result.v[i] = mixin("this.v[i]" ~ op ~ "that.v[i]");
         }
         return result;
+    }
+
+    static if (is(T == float))
+    {
+        public VectorT!(float, N) opBinary(string op)(float scalar)
+        {
+            static if (op == "*" || op == "/")
+            {
+                VectorT!(float, N) result;
+                for (int i = 0; i < N; i++)
+                {
+                    result.v[i] = mixin("this.v[i]" ~ op ~ "scalar");
+                }
+                return result;
+            }
+            else
+            {
+                static assert(0, "Operator '" ~ op ~ "' is not supported.");
+            }
+        }
     }
 
     public static T dot(VectorT!(T, N) a, VectorT!(T, N) b)
@@ -109,4 +129,13 @@ public Point2 toPoint2(const ref Vector2 vector2)
 public Vector2 toVector2(const ref Point2 point2)
 {
     return Vector2(point2.x, point2.y);
+}
+
+
+unittest
+{
+    assert(Vector2(3f, 4f).magnitudeSquared == 25f);
+    assert(Vector2(3f, 4f).magnitude == 5f);
+    assert(Vector2(3f, 4f) * 2f == Vector2(6f, 8f));
+    assert(Vector2.dot(Vector2(1f, 2f), Vector2(3f, 4f)) == 11f);
 }

@@ -1,5 +1,6 @@
 import asr;
 import std.math;
+import std.stdio;
 
 public class DemoGame : Game
 {

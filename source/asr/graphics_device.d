@@ -6,21 +6,33 @@ import std.math;
 import asr.color;
 import asr.vector;
 import asr.math;
+import asr.buffer;
 
 public class GraphicsDevice
 {
-    private SDL_Renderer* _renderer;
+    private int _width;
 
-    public this(SDL_Renderer* renderer)
+    private int _height;
+
+    private Color32Buffer _backBuffer;
+
+    public this(int width, int height)
     {
-        _renderer = renderer;
+        _width = width;
+        _height = height;
+        _backBuffer = new Color32Buffer(_width, _height);
+    }
+
+    @property
+    public Color32Buffer backBuffer()
+    {
+        return _backBuffer;
     }
 
     public void clear(Color color)
     {
         auto color32 = color.toColor32();
-        SDL_SetRenderDrawColor(_renderer, color32.r, color32.g, color32.b, color32.a);
-        SDL_RenderClear(_renderer);
+        _backBuffer.clear(color32);
     }
 
     public void drawLine(Vector2 from, Vector2 to, Color color)
@@ -110,7 +122,6 @@ public class GraphicsDevice
     private void setPixel(int x, int y, const ref Color color)
     {
         auto color32 = color.toColor32();
-        SDL_SetRenderDrawColor(_renderer, color32.r, color32.g, color32.b, color32.a);
-        SDL_RenderDrawPoint(_renderer, x, y);
+        _backBuffer.setPixel(x, y, color32);
     }
 }

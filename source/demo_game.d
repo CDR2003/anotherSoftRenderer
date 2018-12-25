@@ -12,14 +12,19 @@ public class DemoGame : Game
 
     private Vector2 _to;
 
+    private float _currentTime;
+
     public this()
     {
+        _currentTime = 0;
     }
 
     public override void update(float deltaTime)
     {
-        auto x = _radius * cos(deltaTime * _angularSpeed);
-        auto y = _radius * sin(deltaTime * _angularSpeed);
+        _currentTime += deltaTime;
+
+        auto x = _radius * cos(_currentTime * _angularSpeed);
+        auto y = _radius * sin(_currentTime * _angularSpeed);
         auto center = Vector2(this.windowWidth / 2, this.windowHeight / 2);
         _from = center + Vector2(x, y);
         _to = center - Vector2(x, y);

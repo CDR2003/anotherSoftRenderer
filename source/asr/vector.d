@@ -57,6 +57,14 @@ public struct VectorT(T, int N)
         }
     }
 
+    public this(T value)
+    {
+        for (int i = 0; i < N; i++)
+        {
+            this.v[i] = value;
+        }
+    }
+
     public T magnitude() const pure
     {
         return cast(T)sqrt(cast(float)this.magnitudeSquared);
@@ -82,23 +90,20 @@ public struct VectorT(T, int N)
         return result;
     }
 
-    static if (is(T == float))
+    public VectorT!(T, N) opBinary(string op)(T scalar)
     {
-        public VectorT!(float, N) opBinary(string op)(float scalar)
+        static if (op == "*" || op == "/")
         {
-            static if (op == "*" || op == "/")
+            VectorT!(T, N) result;
+            for (int i = 0; i < N; i++)
             {
-                VectorT!(float, N) result;
-                for (int i = 0; i < N; i++)
-                {
-                    result.v[i] = mixin("this.v[i]" ~ op ~ "scalar");
-                }
-                return result;
+                result.v[i] = mixin("this.v[i]" ~ op ~ "scalar");
             }
-            else
-            {
-                static assert(0, "Operator '" ~ op ~ "' is not supported.");
-            }
+            return result;
+        }
+        else
+        {
+            static assert(0, "Operator '" ~ op ~ "' is not supported.");
         }
     }
 
@@ -111,6 +116,9 @@ public struct VectorT(T, int N)
         }
         return result;
     }
+
+    public static immutable VectorT!(T, N) zero = VectorT!(T, N)(0);
+    public static immutable VectorT!(T, N) one = VectorT!(T, N)(1);
 }
 
 

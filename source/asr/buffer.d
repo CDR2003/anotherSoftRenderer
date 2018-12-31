@@ -18,13 +18,13 @@ public class BufferT(T)
     }
 
     @property
-    public int width()
+    public int width() const
     {
         return _width;
     }
 
     @property
-    public int height()
+    public int height() const
     {
         return _height;
     }
@@ -37,7 +37,7 @@ public class BufferT(T)
         }
     }
 
-    public T getPixel(int x, int y)
+    public T getPixel(int x, int y) const
     in
     {
         assert(x >= 0 && x < _width);

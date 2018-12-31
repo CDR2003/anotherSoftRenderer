@@ -30,6 +30,17 @@ public struct ColorT(T)
         this.a = a;
     }
 
+    static if (is(T == ubyte))
+    {
+        public this(uint color)
+        {
+            this.r = (color & 0xff000000) >> 24;
+            this.g = (color & 0x00ff0000) >> 16;
+            this.b = (color & 0x0000ff00) >> 8;
+            this.a = color & 0xff;
+        }
+    }
+
     static if (is(T == float))
     {
         private static immutable T max = 1;

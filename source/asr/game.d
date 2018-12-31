@@ -1,6 +1,7 @@
 module asr.game;
 
 import derelict.sdl2.sdl;
+import derelict.sdl2.image;
 import std.algorithm;
 import std.stdio;
 import std.math;
@@ -12,13 +13,13 @@ import asr.buffer;
 import asr.rect;
 import asr.math;
 
-public class Game
+public abstract class Game
 {
     public immutable string DEFAULT_WINDOW_TITLE = "ASR Demo";
 
-    public immutable int DEFAULT_WINDOW_WIDTH = 640;
+    public immutable int DEFAULT_WINDOW_WIDTH = 1027;
 
-    public immutable int DEFAULT_WINDOW_HEIGHT = 480;
+    public immutable int DEFAULT_WINDOW_HEIGHT = 768;
 
     private string _windowTitle;
 
@@ -72,18 +73,26 @@ public class Game
     public final void run()
     {
         DerelictSDL2.load();
+        DerelictSDL2Image.load();
 
         if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0)
         {
-            writefln("SDL couldn't initialize! SDL_Error: %s", SDL_GetError());
+            writefln("SDL couldn't initialize! SDL Error: %s", fromStringz(SDL_GetError()));
             return;
         }
         scope(exit) SDL_Quit();
 
+        if (IMG_Init(IMG_INIT_PNG) < 0)
+        {
+            writefln("SDL_image couldn't initialize! SDL_image Error: %s", fromStringz(IMG_GetError()));
+            return;
+        }
+        scope(exit) IMG_Quit();
+
         auto window = SDL_CreateWindow(toStringz(_windowTitle), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _windowWidth, _windowHeight, SDL_WindowFlags.SDL_WINDOW_SHOWN);
         if (window == null)
         {
-            writefln("Create window failed! SDL_Error: %s", SDL_GetError());
+            writefln("Create window failed! SDL Error: %s", fromStringz(SDL_GetError()));
             return;
         }
         scope(exit) SDL_DestroyWindow(window);
@@ -91,7 +100,7 @@ public class Game
         auto renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
         if (renderer == null)
         {
-            writefln("Create renderer failed! SDL_Error: %s", fromStringz(SDL_GetError()));
+            writefln("Create renderer failed! SDL Error: %s", fromStringz(SDL_GetError()));
             return;
         }
         scope(exit) SDL_DestroyRenderer(renderer);
@@ -100,6 +109,8 @@ public class Game
         scope(exit) SDL_DestroyTexture(backBufferTexture);
 
         _graphicsDevice = new GraphicsDevice(_windowWidth, _windowHeight);
+
+        this.load();
 
         auto oldTicks = SDL_GetTicks();
         auto running = true;
@@ -131,6 +142,8 @@ public class Game
 
             SDL_RenderPresent(renderer);
         }
+
+        this.unload();
     }
 
     public final void zoom(Point2 zoomCenter, int ratioOffset)
@@ -157,11 +170,19 @@ public class Game
         _paused = !_paused;
     }
 
-    public void update(float deltaTime)
+    public abstract void load()
     {
     }
 
-    public void draw()
+    public abstract void unload()
+    {
+    }
+
+    public abstract void update(float deltaTime)
+    {
+    }
+
+    public abstract void draw()
     {
     }
 

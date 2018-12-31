@@ -1,6 +1,7 @@
 import asr;
 import std.math;
 import std.stdio;
+import std.datetime.stopwatch;
 
 public class DemoGame : Game
 {
@@ -14,9 +15,21 @@ public class DemoGame : Game
 
     private float _currentTime;
 
+    private Texture _texture;
+
     public this()
     {
         _currentTime = 0;
+    }
+
+    public override void load()
+    {
+        _texture = Texture.loadFromFile("res/image.png");
+    }
+
+    public override void unload()
+    {
+
     }
 
     public override void update(float deltaTime)
@@ -32,8 +45,9 @@ public class DemoGame : Game
 
     public override void draw()
     {
-        auto device = this.graphicsDevice;
-        device.clear(Color.black);
-		device.drawLine(_from, _to, Color.white);
+        auto graphics = this.graphicsDevice;
+        graphics.clear(Color.black);
+        graphics.drawTextureRaw(_texture);
+		graphics.drawLine(_from, _to, Color.white);
     }
 }

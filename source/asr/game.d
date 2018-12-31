@@ -88,12 +88,10 @@ public class Game
         }
         scope(exit) SDL_DestroyWindow(window);
 
-        auto screen = SDL_GetWindowSurface(window);
-
         auto renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
         if (renderer == null)
         {
-            writefln("Create renderer failed! SDL_Error: %s", SDL_GetError());
+            writefln("Create renderer failed! SDL_Error: %s", fromStringz(SDL_GetError()));
             return;
         }
         scope(exit) SDL_DestroyRenderer(renderer);
